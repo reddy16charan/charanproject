@@ -1,0 +1,16 @@
+language: java
+jdk: openjdk8
+deploy:
+  provider: releases
+  api_key:
+    secure: S2z4weKP0+/Ip/rvVzlPep3uEGA9cjzq82/OCUgNOWlkv3VrF6X2VAkZfz0TJGJCux+jokXalrItT1ePeWToGDwAf5g98R92QecvFdb6GwyFXIhFdoFCz9BgOD7FZqpFPQByBecBqTphQdKmraSlhCaRN3WwmSFtCt3xIPMNoYw=
+  file_glob: true
+  file: build/libs/*
+  skip_cleanup: true
+  on:
+    all_branches: true
+    tags: true
+    repo: xebialabs-community/xlr-github-plugin
+notifications:
+  slack:
+    secure: pnB3cTAYO5wJbRu5du70AbAfJa/2/GGQqPDsEDLyQRErh3SSvBkNwgXsd9d8mTcjLOwVV38T+c09kbAcPlQsHUA7MwKUNZNrPzfMyHm9/2Y3KIXiDuox4BXt3gG2juaaM95WQckf7t/2ukvRHL8Jua/DzUD/unsk38N9IUS/On4=

@@ -1,0 +1,186 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Copyright 2020 XEBIALABS
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-->
+<synthetic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="http://www.xebialabs.com/deployit/synthetic"
+           xsi:schemaLocation="http://www.xebialabs.com/deployit/synthetic synthetic.xsd">
+
+    <type type="github.Server" extends="xlrelease.Configuration">
+        <property name="scriptLocation" hidden="true" default="github/ConnectionCheck.py"/>
+
+        <property name="loginOrToken" label="Login" kind="string" required="false" description="Login or token"/>
+        <property name="password" label="Password" kind="string" required="false" description="User password"
+                  password="true"/>
+        <property name="baseUrl" label="Base url" kind="string" required="true"
+                  description="Include the API version - for example https://github.myorg.com/api/v3"/>
+        <property name="timeout" label="Timeout" kind="integer" required="true" description="Timeout" default="10"/>
+        <property name="clientId" label="Client id" kind="string" required="false" description="Client ID"/>
+        <property name="clientSecret" label="Client secret" kind="string" required="false" description="Client Secret"
+                  password="true"/>
+        <property name="userAgent" label="User Agent" kind="string" required="true"
+                  description="default user agent to use" default="PyGithub/Python" hidden="true"/>
+        <property name="perPage" label="Per page" kind="integer" required="true" description="Number of items per page"
+                  default="30" hidden="true"/>
+        <property name="apiPreview" label="Api preview" kind="boolean" required="true" description="Use api preview"
+                  default="false" hidden="true"/>
+    </type>
+
+    <type type="github.Task" extends="xlrelease.PythonScript" virtual="true">
+        <property name="iconLocation" default="github/github.png" hidden="true"/>
+
+        <property name="server" category="input" referenced-type="github.Server" kind="ci"/>
+        <property name="loginOrToken" label="Login" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Login or token"/>
+        <property name="password" label="Password" category="input" kind="string" required="false"
+                  description="Overrides shared configuration User password" password="true"/>
+        <property name="clientId" label="Client id" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Client ID"/>
+        <property name="clientSecret" label="Client secret" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Client Secret" password="true"/>
+
+    </type>
+
+    <type type="github.UpdateContent" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/UpdateContent.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+        <property name="branch" category="input" default="master"/>
+        <property name="filePath" category="input"/>
+        <property name="regex" category="input"/>
+        <property name="replacement" category="input"/>
+        <property name="commitMessage" category="input"/>
+
+        <property name="commitId" required="false" category="output"
+                  description="ID of commit in which content was updated"/>
+    </type>
+
+    <type type="github.CreateBranch" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/CreateBranch.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+        <property name="oldBranch" category="input" default="master" required="false"
+                  description="When branch is specified, the new branch will be created from the latest commit on that branch."/>
+        <property name="sha" category="input" required="false"
+                  description="When sha is specified, the branch will be created from the commit corresponding with that SHA. (Takes precedence over oldBranch)"/>
+        <property name="newBranch" category="input" description="New branch to be created"/>
+    </type>
+
+    <type type="github.CreatePullRequest" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/CreatePR.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+        <property name="title" category="input" required="true" description="The title of the pull request."/>
+        <property name="base" category="input" required="true"
+                  description="The name of the branch you want the changes pulled into. "/>
+        <property name="head" category="input" default="master" required="true"
+                  description="The name of the branch where your changes are implemented."/>
+        <property name="body" category="input" required="true" description="The contents of the pull request."/>
+
+        <property name="pullRequestNumber" category="output" kind="integer" description="The created Pull Request Number." />
+    </type>
+
+    <type type="github.MergePullRequest" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/MergePR.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+        <property name="pullRequestNumber" category="input" description="Pull Request Number to be merged" required="true" kind="integer" />
+        <property name="commitMessage" category="input" description="Commit Message" required="true" kind="string" />
+        <property name="deleteBranch" category="input" description="Delete branch after merge" required="false" kind="boolean" default="true" />
+    </type>
+
+    <type type="github.CreateRepository" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/CreateRepository.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+
+        <property name="repositoryId" category="output"/>
+    </type>
+
+    <type type="github.CreateTag" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/CreateTag.py"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+        <property name="branch" category="input" default="master" required="false"
+                  description="When branch is specified, the tag will be placed on the latest commit on that branch."/>
+        <property name="sha" category="input" required="false"
+                  description="When sha is specified, the tag will be placed on the commit corresponding with that SHA. (Takes precedence over branch)"/>
+        <property name="tagName" category="input" description="The tag"/>
+        <property name="tagMessage" category="input" description="The tag message"/>
+    </type>
+
+    <type type="github.Trigger" extends="xlrelease.ReleaseTrigger" virtual="true">
+        <property name="server" category="input" referenced-type="github.Server" kind="ci"/>
+        <property name="loginOrToken" label="Login" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Login or token"/>
+        <property name="password" label="Password" category="input" kind="string" required="false"
+                  description="Overrides shared configuration User password" password="true"/>
+        <property name="clientId" label="Client id" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Client ID"/>
+        <property name="clientSecret" label="Client secret" category="input" kind="string" required="false"
+                  description="Overrides shared configuration Client Secret" password="true"/>
+
+        <property name="organization" category="input" required="false"/>
+        <property name="repositoryName" category="input"/>
+    </type>
+
+    <type type="github.PullRequestTrigger" extends="github.Trigger">
+        <property name="scriptLocation" hidden="true" default="github/PullRequestTrigger.py"/>
+
+        <property name="pullRequest" category="variables" required="false"/>
+    </type>
+
+    <type type="github.CommitTrigger" extends="github.Trigger">
+        <property name="scriptLocation" hidden="true" default="github/CommitTrigger.py"/>
+
+        <property name="branch" category="input" default="master"/>
+
+        <property name="commitId" category="variables" required="false"/>
+    </type>
+
+    <type type="github.GetVersionFromTag" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/GetVersionFromTag.py"/>
+
+        <property name="organization" category="input" required="false" default="xebialabs"/>
+        <property name="repositoryName" category="input" required="true"/>
+        <property name="commitId" category="input" required="true"/>
+        <property name="tagVersion" category="output"/>
+    </type>
+
+    <type type="github.GetHashFromRef" extends="github.Task">
+        <property name="scriptLocation" hidden="true" default="github/GetHashFromRef.py"/>
+
+        <property name="organization" category="input" required="false" default="xebialabs"/>
+        <property name="repositoryName" category="input" required="true"/>
+        <property name="refPath" category="input" required="false" default="heads/master"/>
+        <property name="refHash" category="output"/>
+    </type>
+
+    <!-- Tile Configuration -->
+    <type type="github.UserTile" label="Github User Tile" extends="xlrelease.Tile" description="Display the github user we are connected too">
+        <property default="release,folder,global" hidden="true" name="supportedScopes" kind="list_of_string"/>
+        <property name="uri" hidden="true" default="user-summary.html"/>
+        <property name="title" description="Tile title." default="Github User Summary"/>
+        <property name="server" category="input" label="Github Server" referenced-type="github.Server" kind="ci" />
+    </type>
+
+    <type type="github.WaitForMerge" extends="github.Task" >
+        <property name="scriptLocation" hidden="true" default="github/WaitForMerge.py"/>
+        <property name="organization" category="input" required="false" default="xebialabs"/>
+        <property name="repositoryName" category="input" required="true"/>
+        <property name="prid" category="input"  kind="integer" description="Pull Request Id" label="Pull Request Id"/>
+        <property name="pollInterval" category="input" kind="integer" description="Polling Interval in seconds" label="Poll Interval"/>
+    </type>
+
+</synthetic>
